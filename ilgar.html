@@ -1,0 +1,82 @@
+<!DOCTYPE html><html lang="ug">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ilghar Tech Store</title>
+  <style>
+    body {font-family: Arial; margin:0; background:#fff;}
+    header {background:#111; color:#fff; padding:15px; text-align:center; font-size:20px;}
+    .container {padding:10px;}
+    .product {border:1px solid #ddd; border-radius:10px; padding:10px; margin:10px 0;}
+    img {width:100%; border-radius:10px; margin-bottom:8px;}
+    button {background:#111; color:#fff; border:none; padding:10px; border-radius:5px; width:100%; margin-top:5px;}
+    input {padding:10px; width:100%; margin:5px 0;}
+    .admin {margin-top:20px; border-top:2px solid #eee; padding-top:10px;}
+  </style>
+</head>
+<body><header>🛒 Ilghar Tech Store</header><div class="container" id="products"></div><div class="container admin">
+  <h3>Admin Panel</h3>
+  <input type="text" id="name" placeholder="مەھسۇلات نامى">
+  <input type="number" id="price" placeholder="باھا ($)">
+  <input type="file" id="image">
+  <button onclick="addProduct()">➕ قوشۇش</button>
+</div><script>
+let products = JSON.parse(localStorage.getItem("products")) || [];
+
+function save(){
+  localStorage.setItem("products", JSON.stringify(products));
+}
+
+function render(){
+  let html = "";
+  products.forEach((p,i)=>{
+    html += `
+      <div class='product'>
+        ${p.image ? `<img src="${p.image}">` : ""}
+        <h3>${p.name}</h3>
+        <p>باھا: $${p.price}</p>
+        <button onclick="buy('${p.name}')">🛒 سېتىۋېلىش</button>
+        <button onclick="removeProduct(${i})">❌ ئۆچۈرۈش</button>
+      </div>
+    `;
+  });
+  document.getElementById("products").innerHTML = html;
+}
+
+function addProduct(){
+  const name = document.getElementById("name").value;
+  const price = document.getElementById("price").value;
+  const file = document.getElementById("image").files[0];
+
+  if(name && price){
+    if(file){
+      const reader = new FileReader();
+      reader.onload = function(e){
+        products.push({name, price, image:e.target.result});
+        save();
+        render();
+      }
+      reader.readAsDataURL(file);
+    } else {
+      products.push({name, price});
+      save();
+      render();
+    }
+  }
+}
+
+function removeProduct(i){
+  products.splice(i,1);
+  save();
+  render();
+}
+
+function buy(name){
+  const phone = "963956607127";
+  const msg = `مەن ${name} سېتىۋالماقچى`;
+  window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`);
+}
+
+render();
+</script></body>
+</html>
